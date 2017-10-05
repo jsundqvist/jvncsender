@@ -55,12 +55,12 @@ public class VncMappings {
       builder.put("]", KeyEvent.VK_CLOSE_BRACKET);
 
       // builder.put("$", KeyEvent.VK_DOLLAR);
-      builder.put("Û", KeyEvent.VK_EURO_SIGN);
+      builder.put("ï¿½", KeyEvent.VK_EURO_SIGN);
       // builder.put("!", KeyEvent.VK_EXCLAMATION_MARK);
       builder.put("=", KeyEvent.VK_EQUALS);
 
-      // builder.put("<", KeyEvent.VK_LESS);
-      // builder.put(">", KeyEvent.VK_GREATER);
+      builder.put("<", KeyEvent.VK_LESS);
+      builder.put(">", KeyEvent.VK_GREATER);
       builder.put("(", KeyEvent.VK_LEFT_PARENTHESIS);
       builder.put(")", KeyEvent.VK_RIGHT_PARENTHESIS);
 

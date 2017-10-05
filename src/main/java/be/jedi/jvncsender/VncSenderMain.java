@@ -9,6 +9,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import java.util.Scanner;
+
 public class VncSenderMain {
 
    /**
@@ -28,6 +30,8 @@ public class VncSenderMain {
          sender.validateArgs(args);
 
          String[] vncText = sender.cmdLine.getOptionValues("text");
+         if(vncText.length == 0)
+            vncText = readSystemIn();
          String vncHost = sender.cmdLine.getOptionValue("host");
          String vncPassword = sender.cmdLine.getOptionValue("password");
          Integer vncPort = Integer.parseInt(sender.cmdLine.getOptionValue("port"));
@@ -35,14 +39,22 @@ public class VncSenderMain {
          VncSender vncSender = new VncSender(vncHost, vncPort, vncPassword);
 
          if (sender.cmdLine.hasOption("wait")) {
-            vncSender.setVncWaitTime(Integer.parseInt(sender.cmdLine.getOptionValue("wait")));
+            vncSender.setVncWaitMillis(Integer.parseInt(sender.cmdLine.getOptionValue("wait")));
          }
 
-         vncSender.sendText(vncText);
+         vncSender.send(vncText);
 
       } catch (Exception ex) {
          System.out.println(ex.toString());
       }
+   }
+
+   private static String[] readSystemIn() {
+      StringBuilder builder = new StringBuilder();
+      Scanner scanner = new Scanner(System.in);
+      while(scanner.hasNext())
+         builder.append(scanner.next());
+      return new String[] {builder.toString()};
    }
 
    void setupOptions() {

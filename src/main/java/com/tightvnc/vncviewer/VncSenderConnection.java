@@ -6,11 +6,12 @@ package com.tightvnc.vncviewer;
  * of methods or variables
  * */
 
+import be.jedi.jvncsender.VncMappings;
+
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import be.jedi.jvncsender.VncMappings;
 
 //http://stackoverflow.com/questions/1248510/convert-string-to-keyevents
 //http://stackoverflow.com/questions/664896/get-the-vk-int-from-an-arbitrary-char-in-java
@@ -43,6 +44,11 @@ public class VncSenderConnection {
    int port = 5900;
    String passwordParam = "";
 
+   boolean shift = false;
+   boolean alt = false;
+   boolean control = false;
+   boolean meta = false;
+
    public VncSenderConnection(String host, int port, String password) {
       this.host = host;
       this.port = port;
@@ -73,11 +79,6 @@ public class VncSenderConnection {
 
       rfb.eventBufLen = 0;
 
-      boolean shift = false;
-      boolean alt = false;
-      boolean control = false;
-      boolean meta = false;
-
 //      //reset modifiers
 //      rfb.writeKeyEvent(0xffe1, false);
 //      rfb.writeKeyEvent(0xffe9, false);
@@ -90,7 +91,13 @@ public class VncSenderConnection {
   //        System.out.println(Integer.toHexString(key) +"||");
          System.out.print(".");
 
-         switch (key) {
+         writeKeyEvent(key);
+      }
+      System.out.println();
+   }
+
+   public void writeKeyEvent(Integer key) throws IOException {
+      switch(key) {
          case 0xffe1:
             shift = true;
             rfb.writeKeyEvent(key, true);
@@ -109,25 +116,25 @@ public class VncSenderConnection {
             break;
          default: {
 
-        	//Key Press
+            //Key Press
             rfb.writeKeyEvent(key, true);
             //Key Release
             rfb.writeKeyEvent(key, false);
 
             // Reset modifiers after
-            if (shift) {
+            if(shift) {
                shift = false;
                rfb.writeKeyEvent(0xffe1, false);
             }
-            if (alt) {
+            if(alt) {
                alt = false;
                rfb.writeKeyEvent(0xffe9, false);
             }
-            if (control) {
+            if(control) {
                rfb.writeKeyEvent(0xffe3, false);
                control = false;
             }
-            if (meta) {
+            if(meta) {
                rfb.writeKeyEvent(0xffe7, false);
                meta = false;
             }
@@ -136,9 +143,7 @@ public class VncSenderConnection {
             rfb.eventBufLen = 0;
          }
 
-         }
       }
-      System.out.println();
    }
 
    void sendInit() throws Exception {
