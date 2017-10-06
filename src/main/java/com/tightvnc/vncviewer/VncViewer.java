@@ -739,8 +739,8 @@ public class VncViewer extends java.applet.Applet
 
   //
   // Read password parameters. If an "ENCPASSWORD" parameter is set,
-  // then decrypt the password into the passwordParam string. Otherwise,
-  // try to read the "PASSWORD" parameter directly to passwordParam.
+  // then decrypt the password into the password string. Otherwise,
+  // try to read the "PASSWORD" parameter directly to password.
   //
 
   private void readPasswordParameters() {

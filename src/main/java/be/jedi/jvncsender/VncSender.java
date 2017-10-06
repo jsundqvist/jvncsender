@@ -7,91 +7,102 @@ import java.io.IOException;
 
 public class VncSender {
 
-   int vncWaitMillis = 1;
+	public static final int ENTER = 0xFF0D;
+	public static final int ESC = 0xFF1B;
 
-   String vncHost;
-   int vncPort;
-   String vncPassword;
-   private final VncSenderConnection jvnc;
+	private final VncSenderConnection jvnc;
+	int vncWaitMillis = 1;
+	String vncHost;
+	int vncPort;
+	String vncPassword;
 
-   public VncSender(String vncHost, int vncPort, String vncPassword) throws Exception {
-      super();
-      this.vncHost = vncHost;
-      this.vncPort = vncPort;
-      this.vncPassword = vncPassword;
-      jvnc = new VncSenderConnection(vncHost, vncPort, vncPassword);
-      jvnc.open();
-   }
+	public VncSender(String vncHost, int vncPort, String vncPassword) throws Exception {
+		super();
+		this.vncHost = vncHost;
+		this.vncPort = vncPort;
+		this.vncPassword = vncPassword;
+		jvnc = new VncSenderConnection(vncHost, vncPort, vncPassword);
+		jvnc.open();
+	}
 
-   public void send(String vncText) throws Exception {
-      String[] vncTextArray = new String[1];
-      vncTextArray[0] = vncText;
-      this.send(vncTextArray);
-   }
+	public void println(String line) throws IOException {
+		send(line);
+		sendKey(ENTER);
+	}
 
-   public void send(String... vncText) throws Exception {
-      send(ImmutableList.copyOf(vncText));
-   }
+	public void print(String line) {
 
-   public void send(Iterable<String> vncText) throws Exception {
+	}
 
-      // Ignore Cert file
-      // https://www.chemaxon.com/forum/ftopic65.html&highlight=jmsketch+signer
+	public void send(String vncText) throws IOException {
+		String[] vncTextArray = new String[1];
+		vncTextArray[0] = vncText;
+		this.send(vncTextArray);
+	}
 
-      for (String line : vncText) {
-         System.out.println("Sending line: " + line);
+	public void send(String... vncText) throws IOException {
+		send(ImmutableList.copyOf(vncText));
+	}
 
-         for(char c : line.toCharArray()) {
-            jvnc.print("" + c);
-            sleep(vncWaitMillis);
-         }
+	public void send(Iterable<String> vncText) throws IOException {
 
-      }
+		// Ignore Cert file
+		// https://www.chemaxon.com/forum/ftopic65.html&highlight=jmsketch+signer
 
-   }
+		for(String line : vncText) {
+			System.out.println("Sending line: " + line);
 
-   public void sendKey(int key) throws IOException {
-      jvnc.writeKeyEvent(key);
-   }
+			for(char c : line.toCharArray()) {
+				jvnc.print("" + c);
+				sleep(vncWaitMillis);
+			}
 
-   void sleep(int millis) {
-      // We need to wait
-      try {
-         Thread.sleep(millis);// sleep for 1000 ms
-      } catch (InterruptedException ie) {
-      }
-   }
+		}
 
-   public int getVncWaitMillis() {
-      return vncWaitMillis;
-   }
+	}
 
-   public void setVncWaitMillis(int vncWaitMillis) {
-      this.vncWaitMillis = vncWaitMillis;
-   }
+	public void sendKey(int key) throws IOException {
+		jvnc.write(key);
+	}
 
-   public String getVncHost() {
-      return vncHost;
-   }
+	void sleep(int millis) {
+		// We need to wait
+		try {
+			Thread.sleep(millis);// sleep for 1000 ms
+		} catch(InterruptedException ie) {
+		}
+	}
 
-   public void setVncHost(String vncHost) {
-      this.vncHost = vncHost;
-   }
+	public int getVncWaitMillis() {
+		return vncWaitMillis;
+	}
 
-   public int getVncPort() {
-      return vncPort;
-   }
+	public void setVncWaitMillis(int vncWaitMillis) {
+		this.vncWaitMillis = vncWaitMillis;
+	}
 
-   public void setVncPort(int vncPort) {
-      this.vncPort = vncPort;
-   }
+	public String getVncHost() {
+		return vncHost;
+	}
 
-   public String getVncPassword() {
-      return vncPassword;
-   }
+	public void setVncHost(String vncHost) {
+		this.vncHost = vncHost;
+	}
 
-   public void setVncPassword(String vncPassword) {
-      this.vncPassword = vncPassword;
-   }
+	public int getVncPort() {
+		return vncPort;
+	}
+
+	public void setVncPort(int vncPort) {
+		this.vncPort = vncPort;
+	}
+
+	public String getVncPassword() {
+		return vncPassword;
+	}
+
+	public void setVncPassword(String vncPassword) {
+		this.vncPassword = vncPassword;
+	}
 
 }

@@ -24,6 +24,8 @@ package com.tightvnc.vncviewer;//
 // RfbProto.java
 //
 
+import com.tightvnc.vncviewer.*;
+
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -272,7 +274,7 @@ class RfbProto {
   // Read server's protocol version message
   //
 
-  void readVersionMsg() throws Exception {
+  void readVersionMsg() throws IOException {
 
     byte[] b = new byte[12];
 
@@ -284,7 +286,7 @@ class RfbProto {
 	|| (b[8] < '0') || (b[8] > '9') || (b[9] < '0') || (b[9] > '9')
 	|| (b[10] < '0') || (b[10] > '9') || (b[11] != '\n'))
     {
-      throw new Exception("Host " + host + " port " + port +
+      throw new IOException("Host " + host + " port " + port +
 			  " is not an RFB server");
     }
 
@@ -292,7 +294,7 @@ class RfbProto {
     serverMinor = (b[8] - '0') * 100 + (b[9] - '0') * 10 + (b[10] - '0');
 
     if (serverMajor < 3) {
-      throw new Exception("RFB server does not support protocol version 3");
+      throw new IOException("RFB server does not support protocol version 3");
     }
   }
 
@@ -322,7 +324,7 @@ class RfbProto {
   // Negotiate the authentication scheme.
   //
 
-  int negotiateSecurity() throws Exception {
+  int negotiateSecurity() throws IOException {
     return (clientMinor >= 7) ?
       selectSecurityType() : readSecurityType();
   }
@@ -331,7 +333,7 @@ class RfbProto {
   // Read security type from the server (protocol version 3.3).
   //
 
-  int readSecurityType() throws Exception {
+  int readSecurityType() throws IOException {
     int secType = readU32();
 
     switch (secType) {
@@ -342,7 +344,7 @@ class RfbProto {
     case SecTypeVncAuth:
       return secType;
     default:
-      throw new Exception("Unknown security type from RFB server: " + secType);
+      throw new IOException("Unknown security type from RFB server: " + secType);
     }
   }
 
@@ -350,7 +352,7 @@ class RfbProto {
   // Select security type from the server's list (protocol versions 3.7/3.8).
   //
 
-  int selectSecurityType() throws Exception {
+  int selectSecurityType() throws IOException {
     int secType = SecTypeInvalid;
 
     // Read the list of secutiry types.
@@ -380,7 +382,7 @@ class RfbProto {
     }
 
     if (secType == SecTypeInvalid) {
-      throw new Exception("Server did not offer supported security type");
+      throw new IOException("Server did not offer supported security type");
     } else {
       os.write(secType);
     }
@@ -392,7 +394,7 @@ class RfbProto {
   // Perform "no authentication".
   //
 
-  void authenticateNone() throws Exception {
+  void authenticateNone() throws IOException {
     if (clientMinor >= 8)
       readSecurityResult("No authentication");
   }
@@ -401,7 +403,7 @@ class RfbProto {
   // Perform standard VNC Authentication.
   //
 
-  void authenticateVNC(String pw) throws Exception {
+  void authenticateVNC(String pw) throws IOException {
     byte[] challenge = new byte[16];
     readFully(challenge);
 
@@ -431,7 +433,7 @@ class RfbProto {
   // Throws an exception on authentication failure.
   //
 
-  void readSecurityResult(String authType) throws Exception {
+  void readSecurityResult(String authType) throws IOException {
     int securityResult = readU32();
 
     switch (securityResult) {
@@ -441,11 +443,11 @@ class RfbProto {
     case VncAuthFailed:
       if (clientMinor >= 8)
         readConnFailedReason();
-      throw new Exception(authType + ": failed");
+      throw new IOException(authType + ": failed");
     case VncAuthTooMany:
-      throw new Exception(authType + ": failed, too many tries");
+      throw new IOException(authType + ": failed, too many tries");
     default:
-      throw new Exception(authType + ": unknown result " + securityResult);
+      throw new IOException(authType + ": unknown result " + securityResult);
     }
   }
 
@@ -454,11 +456,11 @@ class RfbProto {
   // and throw an exception.
   //
 
-  void readConnFailedReason() throws Exception {
+  void readConnFailedReason() throws IOException {
     int reasonLen = readU32();
     byte[] reason = new byte[reasonLen];
     readFully(reason);
-    throw new Exception(new String(reason));
+    throw new IOException(new String(reason));
   }
 
   //
@@ -535,7 +537,7 @@ class RfbProto {
   // Negotiate authentication scheme (TightVNC protocol extensions)
   //
 
-  int negotiateAuthenticationTight() throws Exception {
+  int negotiateAuthenticationTight() throws IOException {
     int nAuthTypes = readU32();
     if (nAuthTypes == 0)
       return AuthNone;
@@ -548,7 +550,7 @@ class RfbProto {
 	return authType;
       }
     }
-    throw new Exception("No suitable authentication scheme found");
+    throw new IOException("No suitable authentication scheme found");
   }
 
   //
@@ -739,7 +741,7 @@ class RfbProto {
 
   int updateRectX, updateRectY, updateRectW, updateRectH, updateRectEncoding;
 
-  void readFramebufferUpdateRectHdr() throws Exception {
+  void readFramebufferUpdateRectHdr() throws IOException {
     updateRectX = readU16();
     updateRectY = readU16();
     updateRectW = readU16();
@@ -784,7 +786,7 @@ class RfbProto {
 
     if (updateRectX + updateRectW > framebufferWidth ||
 	updateRectY + updateRectH > framebufferHeight) {
-      throw new Exception("Framebuffer update rectangle too large: " +
+      throw new IOException("Framebuffer update rectangle too large: " +
 			  updateRectW + "x" + updateRectH + " at (" +
 			  updateRectX + "," + updateRectY + ")");
     }

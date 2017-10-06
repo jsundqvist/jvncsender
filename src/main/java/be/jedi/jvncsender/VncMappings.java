@@ -221,10 +221,10 @@ public class VncMappings {
 
       Builder<String, Integer> builder = ImmutableMap.builder();
 
-      // writeKeyEvent(0xffe3, (newModifiers & CTRL_MASK) != 0);
-      // writeKeyEvent(0xffe1, (newModifiers & SHIFT_MASK) != 0);
-      // writeKeyEvent(0xffe7, (newModifiers & META_MASK) != 0);
-      // writeKeyEvent(0xffe9, (newModifiers & ALT_MASK) != 0);
+      // write(0xffe3, (newModifiers & CTRL_MASK) != 0);
+      // write(0xffe1, (newModifiers & SHIFT_MASK) != 0);
+      // write(0xffe7, (newModifiers & META_MASK) != 0);
+      // write(0xffe9, (newModifiers & ALT_MASK) != 0);
 
       builder.put("<SHIFT>", 0xffe1);
       builder.put("<ALT>", 0xffe9);
